@@ -14,42 +14,42 @@ final class ModuleManager
     /**
      * install
      */
-    public function install(/* ... */): mixed
+    public function install()
     {
         return null;
     }
     /**
      * uninstall
      */
-    public function uninstall(/* ... */): mixed
+    public function uninstall()
     {
         return null;
     }
     /**
      * enable
      */
-    public function enable(/* ... */): mixed
+    public function enable()
     {
-        return $this;
+        return null;
     }
     /**
      * disable
      */
-    public function disable(/* ... */): mixed
+    public function disable()
     {
-        return $this;
+        return null;
     }
     /**
      * update
      */
-    public function update(/* ... */): mixed
+    public function update(array $values): self
     {
-        return $this;
+        return null;
     }
     /**
      * validate
      */
-    public function validate(/* ... */): mixed
+    public function validate()
     {
         return null;
     }

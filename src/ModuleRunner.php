@@ -14,7 +14,7 @@ final class ModuleRunner
     /**
      * run
      */
-    public function run(/* ... */): mixed
+    public function run()
     {
         return null;
     }
