@@ -4,83 +4,123 @@ declare(strict_types=1);
 
 namespace Tavaan\Engine\Module;
 
-use Tavaan\Core\Contracts\Config\RepositoryInterface as Config;
+use Tavaan\Engine\Module\Exceptions\ModuleException;
 
 /**
- * ModuleRegistry — پیاده‌سازی اصلی موتور.
- *
- * @see \Tavaan\Engine\Module\Contracts\ModuleRegistryInterface
+ * ModuleRegistry — ثبت، جست‌وجو و مدیریت ماژول‌ها.
  */
-final class ModuleRegistry implements Contracts\ModuleRegistryInterface
+final class ModuleRegistry
 {
     /**
-     * @param Config $config پیکربندی موتور
+     * @var array<string, Module>
      */
+    private array $modules = [];
+
     public function __construct(
-        private readonly Config $config,
+        private readonly ManifestParser $parser = new ManifestParser(),
+        private readonly TopologicalSorter $sorter = new TopologicalSorter(),
     ) {
     }
 
     /**
-     * {@inheritdoc}
+     * کشف همه‌ی ماژول‌ها از یک دایرکتوری.
+     *
+     * @param string $baseDir مسیر modules/
      */
-    public function discover(/* ... */): mixed
+    public function discover(string $baseDir): void
     {
-        // TODO: پیاده‌سازی discover مطابق مستندات (سند §3 API).
-        return null;
+        if (!\is_dir($baseDir)) return;
+        foreach (\scandir($baseDir) ?: [] as $entry) {
+            if ($entry === '.' || $entry === '..') continue;
+            $manifestPath = "{$baseDir}/{$entry}/module.json";
+            if (\file_exists($manifestPath)) {
+                try {
+                    $module = $this->parser->parse($manifestPath);
+                    $this->modules[$module->id] = $module;
+                } catch (ModuleException $e) {
+                    // Skip invalid module
+                    continue;
+                }
+            }
+        }
+    }
+
+    public function register(Module $module): void
+    {
+        $this->modules[$module->id] = $module;
+    }
+
+    public function get(string $id): Module
+    {
+        if (!isset($this->modules[$id])) {
+            throw ModuleException::notFound($id);
+        }
+        return $this->modules[$id];
+    }
+
+    public function all(): array
+    {
+        return \array_values($this->modules);
+    }
+
+    public function enabled(): array
+    {
+        return \array_values(\array_filter($this->modules, fn(Module $m) => $m->enabled));
+    }
+
+    public function enable(string $id): void
+    {
+        $this->get($id)->enabled = true;
+    }
+
+    public function disable(string $id): void
+    {
+        $this->get($id)->enabled = false;
+    }
+
+    public function enabled_check(string $id): bool
+    {
+        try {
+            return $this->get($id)->enabled;
+        } catch (ModuleException) {
+            return false;
+        }
+    }
+
+    public function sorted(): array
+    {
+        $sorted = $this->sorter->sort($this->modules);
+        return \array_map(fn($id) => $this->modules[$id], $sorted);
     }
 
     /**
-     * {@inheritdoc}
+     * لیست وابستگی‌های یک ماژول.
+     *
+     * @return list<string>
      */
-    public function all(/* ... */): mixed
+    public function dependencies(string $id): array
     {
-        // TODO: پیاده‌سازی all مطابق مستندات (سند §3 API).
-        return null;
+        return $this->get($id)->requires();
     }
 
     /**
-     * {@inheritdoc}
+     * لیست ماژول‌هایی که به این ماژول وابسته‌اند.
+     *
+     * @return list<string>
      */
-    public function get(/* ... */): mixed
+    public function dependentsOf(string $id): array
     {
-        // TODO: پیاده‌سازی get مطابق مستندات (سند §3 API).
-        return null;
+        $result = [];
+        foreach ($this->modules as $mod) {
+            if (\in_array($id, $mod->requires(), true)) {
+                $result[] = $mod->id;
+            }
+        }
+        return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function sorted(/* ... */): mixed
+    public function has(string $id): bool
     {
-        // TODO: پیاده‌سازی sorted مطابق مستندات (سند §3 API).
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enabled(/* ... */): mixed
-    {
-        // TODO: پیاده‌سازی enabled مطابق مستندات (سند §3 API).
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dependencies(/* ... */): mixed
-    {
-        // TODO: پیاده‌سازی dependencies مطابق مستندات (سند §3 API).
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dependentsOf(/* ... */): mixed
-    {
-        // TODO: پیاده‌سازی dependentsOf مطابق مستندات (سند §3 API).
-        return null;
+        return isset($this->modules[$id]);
     }
 }

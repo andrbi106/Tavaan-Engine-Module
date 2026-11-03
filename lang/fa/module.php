@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-/*| پیام‌های fa برای موتور module */
-
 return [
-    'error_default' => 'خطای ناشناخته (module)',
-    'not_configured' => 'موتور پیکربندی نشده است (module)',
+    'error_not_found' => 'ماژول «{0}» یافت نشد.',
+    'error_manifest' => 'خطا در خواندن manifest ماژول: {0}',
+    'error_circular' => 'وابستگی چرخه‌ای در ماژول «{0}».',
 ];

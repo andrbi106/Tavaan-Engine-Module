@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-/*| پیام‌های en برای موتور module */
-
 return [
-    'error_default' => 'Unknown error (module)',
-    'not_configured' => 'Engine not configured (module)',
+    'error_not_found' => 'Module "{0}" not found.',
+    'error_manifest' => 'Failed to read module manifest: {0}',
+    'error_circular' => 'Circular dependency in module "{0}".',
 ];

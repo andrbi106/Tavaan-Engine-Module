@@ -11,25 +11,17 @@
     }
   },
   "providers": [
-    "Tavaan\\Engine\\Module\\ModuleRegistryServiceProvider"
+    "Tavaan\\Engine\\Module\\ModuleServiceProvider"
   ],
   "requires": {
     "php": ">=8.2",
-    "engines": [
-      "container",
-      "config"
-    ]
+    "engines": ["container", "config"]
+  },
+  "config": {
+    "file": "config/module.php",
+    "key": "module"
   },
   "tables": [],
-  "commands": [
-    "module:list",
-    "module:enable",
-    "module:disable",
-    "module:validate"
-  ],
-  "facade": {
-    "name": "Module",
-    "accessor": "modules"
-  },
+  "commands": [],
   "docs": "docs/03-engines/module.md"
 }
