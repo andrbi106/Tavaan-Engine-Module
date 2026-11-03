@@ -47,13 +47,13 @@ final class ModuleManager
      */
     public function update(array $values): self
     {
-        return null;
+        return $this;
     }
     /**
      * validate
      */
-    public function validate()
+    public function validate(string $name): bool
     {
-        return null;
+        return $this->registry->has($name);
     }
 }
