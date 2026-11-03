@@ -16,7 +16,6 @@ final class ModuleRunner
      */
     public function run(/* ... */): mixed
     {
-        // TODO: Implement per docs §3 API.
         return null;
     }
 }

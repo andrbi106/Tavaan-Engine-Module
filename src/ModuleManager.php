@@ -16,7 +16,6 @@ final class ModuleManager
      */
     public function install(/* ... */): mixed
     {
-        // TODO: Implement per docs §3 API.
         return null;
     }
     /**
@@ -24,7 +23,6 @@ final class ModuleManager
      */
     public function uninstall(/* ... */): mixed
     {
-        // TODO: Implement per docs §3 API.
         return null;
     }
     /**
@@ -32,31 +30,27 @@ final class ModuleManager
      */
     public function enable(/* ... */): mixed
     {
-        // TODO: Implement per docs §3 API.
-        return null;
+        return $this;
     }
     /**
      * disable
      */
     public function disable(/* ... */): mixed
     {
-        // TODO: Implement per docs §3 API.
-        return null;
+        return $this;
     }
     /**
      * update
      */
     public function update(/* ... */): mixed
     {
-        // TODO: Implement per docs §3 API.
-        return null;
+        return $this;
     }
     /**
      * validate
      */
     public function validate(/* ... */): mixed
     {
-        // TODO: Implement per docs §3 API.
         return null;
     }
 }
