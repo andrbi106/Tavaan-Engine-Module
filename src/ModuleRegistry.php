@@ -4,171 +4,83 @@ declare(strict_types=1);
 
 namespace Tavaan\Engine\Module;
 
-use Tavaan\Engine\Module\Exceptions\ModuleException;
+use Tavaan\Core\Contracts\Config\RepositoryInterface as Config;
 
 /**
- * تَوان | Tavaan — Module
- * ModuleRegistry — کشف، ثبت، جست‌وجو و مرتب‌سازی توپولوژیک ماژول‌ها/موتورها.
+ * ModuleRegistry — پیاده‌سازی اصلی موتور.
  *
- * منابع کشف: `engines/*&#47;module.json` و `modules/*&#47;module.json` و kits.
- * وضعیت فعال/غیرفعال از config (modules.disabled) + فایل وضعیت در storage.
- *
- * @api 1.0
- * @see docs/03-engines/module.md
+ * @see \Tavaan\Engine\Module\Contracts\ModuleRegistryInterface
  */
-final class ModuleRegistry
+final class ModuleRegistry implements Contracts\ModuleRegistryInterface
 {
-    /** @var array<string, Module> کلید = شناسهٔ کامل (tavaan.engine.cache) */
-    private array $modules = [];
-
-    /** @var array<string, string> شناسهٔ کامل → کوتاه (cache) */
-    private array $shortIds = [];
-
-    private bool $discovered = false;
-
     /**
-     * @param list<string>          $paths        مسیرهای کشف (مطلق)
-     * @param array<string, mixed>  $statusMap    وضعیت‌های پایدار (id → active|disabled)
-     * @param list<string>          $disabled     از config modules.disabled
+     * @param Config $config پیکربندی موتور
      */
     public function __construct(
-        private readonly array $paths = [],
-        private array $statusMap = [],
-        private readonly array $disabled = [],
-        private readonly ManifestParser $parser = new ManifestParser(),
-        private readonly TopologicalSorter $sorter = new TopologicalSorter(),
+        private readonly Config $config,
     ) {
     }
 
-    /** کشف ماژول‌ها از مسیرها (idempotent). */
-    public function discover(): void
+    /**
+     * {@inheritdoc}
+     */
+    public function discover(/* ... */): mixed
     {
-        if ($this->discovered) {
-            return;
-        }
-        $this->discovered = true;
-
-        foreach ($this->paths as $path) {
-            foreach (\glob(\rtrim($path, '/') . '/*/module.json') ?: [] as $manifestFile) {
-                $manifest = $this->parser->parse($manifestFile);
-
-                $enabled = !\in_array($manifest->id, $this->disabled, true)
-                    && ($this->statusMap[$manifest->id] ?? 'active') !== 'disabled';
-
-                $module = new Module($manifest, $enabled);
-                $this->modules[$manifest->id] = $module;
-                // first-wins: در هم‌نامی کوتاه (موتور media / ماژول tavaan.media)
-                // موتور — که زودتر کشف می‌شود — برنده است (ارجاع کوتاه بدون ابهام).
-                $this->shortIds[$this->shortId($manifest->id)] ??= $manifest->id;
-            }
-        }
+        // TODO: پیاده‌سازی discover مطابق مستندات (سند §3 API).
+        return null;
     }
 
-    /** @return array<string, Module> */
-    public function all(): array
+    /**
+     * {@inheritdoc}
+     */
+    public function all(/* ... */): mixed
     {
-        $this->discover();
-
-        return $this->modules;
+        // TODO: پیاده‌سازی all مطابق مستندات (سند §3 API).
+        return null;
     }
 
-    public function get(string $id): Module
+    /**
+     * {@inheritdoc}
+     */
+    public function get(/* ... */): mixed
     {
-        $this->discover();
-
-        $full = $this->modules[$id] ?? $this->modules[$this->shortIds[$id] ?? ''] ?? null;
-        if ($full === null) {
-            throw ModuleException::notFound($id);
-        }
-
-        return $full;
+        // TODO: پیاده‌سازی get مطابق مستندات (سند §3 API).
+        return null;
     }
 
-    public function has(string $id): bool
+    /**
+     * {@inheritdoc}
+     */
+    public function sorted(/* ... */): mixed
     {
-        $this->discover();
-
-        return isset($this->modules[$id]) || isset($this->shortIds[$id]);
+        // TODO: پیاده‌سازی sorted مطابق مستندات (سند §3 API).
+        return null;
     }
 
-    public function enabled(string $id): bool
+    /**
+     * {@inheritdoc}
+     */
+    public function enabled(/* ... */): mixed
     {
-        return $this->get($id)->enabled();
+        // TODO: پیاده‌سازی enabled مطابق مستندات (سند §3 API).
+        return null;
     }
 
-    /** مرتب‌سازی توپولوژیک ماژول‌های فعال. @return list<Module> */
-    public function sorted(): array
+    /**
+     * {@inheritdoc}
+     */
+    public function dependencies(/* ... */): mixed
     {
-        $active = [];
-        foreach ($this->all() as $module) {
-            if ($module->enabled()) {
-                // کلید = شناسهٔ کامل → بدون برخورد بین موتور و ماژول هم‌نام (M9)
-                $active[$module->id()] = $module;
-            }
-        }
-
-        return $this->sorter->sort($active);
+        // TODO: پیاده‌سازی dependencies مطابق مستندات (سند §3 API).
+        return null;
     }
 
-    /** @return list<string> وابستگی‌های مستقیم */
-    public function dependencies(string $id): array
+    /**
+     * {@inheritdoc}
+     */
+    public function dependentsOf(/* ... */): mixed
     {
-        return $this->get($id)->dependencies();
-    }
-
-    /** @return list<string> ماژول‌هایی که به این ماژول وابسته‌اند */
-    public function dependentsOf(string $id): array
-    {
-        $this->discover();
-        $short = $this->shortId($this->get($id)->id());
-
-        $full = $this->get($id)->id();
-
-        $dependents = [];
-        foreach ($this->modules as $otherId => $module) {
-            if ($module->id() === $full) {
-                continue;
-            }
-            $deps = $module->dependencies();
-            if (\in_array($short, $deps, true) || \in_array($full, $deps, true)) {
-                $dependents[] = $otherId;
-            }
-        }
-
-        return $dependents;
-    }
-
-    public function setEnabled(string $id, bool $enabled): void
-    {
-        $module = $this->get($id);
-        $module->setEnabled($enabled);
-        $this->statusMap[$module->id()] = $enabled ? 'active' : 'disabled';
-    }
-
-    /** @return array<string, string> */
-    public function statusMap(): array
-    {
-        return $this->statusMap;
-    }
-
-    /** تعداد ماژول‌های فعال/کل. @return array{enabled: int, total: int} */
-    public function counts(): array
-    {
-        $enabled = 0;
-        foreach ($this->all() as $m) {
-            if ($m->enabled()) {
-                $enabled++;
-            }
-        }
-
-        return ['enabled' => $enabled, 'total' => \count($this->modules)];
-    }
-
-    /** tavaan.engine.cache → cache ؛ tavaan.shop → shop */
-    private function shortId(string $id): string
-    {
-        $parts = \explode('.', $id);
-
-        return \end($parts) ?: $id;
+        // TODO: پیاده‌سازی dependentsOf مطابق مستندات (سند §3 API).
+        return null;
     }
 }
