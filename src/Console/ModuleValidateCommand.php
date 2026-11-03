@@ -9,7 +9,7 @@ use Tavaan\Core\Contracts\Console\CommandInterface;
 /**
  * module:validate command.
  */
-final class Module_validateCommand implements CommandInterface
+final class ModuleValidateCommand implements CommandInterface
 {
     public function name(): string
     {

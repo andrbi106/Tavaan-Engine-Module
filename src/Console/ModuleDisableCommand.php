@@ -9,7 +9,7 @@ use Tavaan\Core\Contracts\Console\CommandInterface;
 /**
  * module:disable command.
  */
-final class Module_disableCommand implements CommandInterface
+final class ModuleDisableCommand implements CommandInterface
 {
     public function name(): string
     {
