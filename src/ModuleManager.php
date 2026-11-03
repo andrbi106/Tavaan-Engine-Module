@@ -14,30 +14,33 @@ final class ModuleManager
     /**
      * install
      */
-    public function install()
+    public function install(string $name): bool
     {
-        return null;
+        $this->registry->get($name)->enabled = true;
+        return true;
     }
     /**
      * uninstall
      */
-    public function uninstall()
+    public function uninstall(string $name): bool
     {
-        return null;
+        $module = $this->registry->get($name);
+        $module->enabled = false;
+        return true;
     }
     /**
      * enable
      */
-    public function enable()
+    public function enable(string $name): void
     {
-        return null;
+        $this->registry->enable($name);
     }
     /**
      * disable
      */
-    public function disable()
+    public function disable(string $name): void
     {
-        return null;
+        $this->registry->disable($name);
     }
     /**
      * update

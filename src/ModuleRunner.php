@@ -14,8 +14,13 @@ final class ModuleRunner
     /**
      * run
      */
-    public function run()
+    public function run(string $uri, array $params = []): mixed
     {
-        return null;
+        $parts = explode("/", $uri, 2);
+        $module = $parts[0] ?? "";
+        $action = $parts[1] ?? "index";
+        $mod = $this->registry->get("tavaan." . $module);
+        if ($mod === null) return null;
+        return ["module" => $module, "action" => $action, "params" => $params];
     }
 }
