@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Tavaan\Engine\Module\Exceptions;
 
+use Tavaan\Core\Exceptions\TavaanException;
+
 use RuntimeException;
 
-final class ModuleException extends RuntimeException
+final class ModuleException extends TavaanException
 {
     public static function manifestUnreadable(string $path): self
     {
