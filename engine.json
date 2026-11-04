@@ -15,7 +15,10 @@
   ],
   "requires": {
     "php": ">=8.2",
-    "engines": ["container", "config"]
+    "engines": [
+      "container",
+      "config"
+    ]
   },
   "config": {
     "file": "config/module.php",
@@ -23,5 +26,6 @@
   },
   "tables": [],
   "commands": [],
-  "docs": "docs/03-engines/module.md"
+  "docs": "docs/03-engines/module.md",
+  "class": "Tavaan\\Engine\\Module\\ModuleEngine"
 }

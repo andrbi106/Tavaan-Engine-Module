@@ -2,6 +2,8 @@
 
 > **کشف و مدیریت ماژول** — موتور Module در فریمورک تَوان
 
+این موتور از کلاس پایهٔ `Engine` (در [Tavaan-Engine-Core](https://github.com/andrbi106/Tavaan-Engine-Core)) ارث می‌برد.
+
 ## مشخصات
 
 | فیلد | مقدار |
@@ -11,66 +13,60 @@
 | عنوان فارسی | کشف و مدیریت ماژول |
 | نسخه | `0.1.0` |
 | namespace | `Tavaan\Engine\Module` |
-| نوع | `engine` |
+| کلاس موتور | `Tavaan\Engine\Module\ModuleEngine` |
+| Facade |  |
 
-## خطاها (Exceptions)
+## کلاس موتور
 
-- `Tavaan\Engine\Module\Exceptions\CircularModuleDependencyException`
-- `Tavaan\Engine\Module\Exceptions\ModuleException`
+```php
+namespace Tavaan\Engine\Module;
 
-## Facadeها
+use Tavaan\EngineCore\Engine as BaseEngine;
+use Tavaan\EngineCore\Contracts\EngineManifestInterface;
 
-- `Tavaan\Engine\Module\Facades\Module`
+final class ModuleEngine extends BaseEngine
+{
+    public function __construct(EngineManifestInterface $manifest)
+    {
+        parent::__construct($manifest);
+    }
 
-## کلاس‌های اصلی
+    public function register(ContainerInterface $container): void
+    {
+        parent::register($container);
+        // bindingهای اختصاصی موتور
+    }
 
-- `src/Console/KitInstallCommand.php`
-- `src/Console/KitListCommand.php`
-- `src/Kit/KitException.php`
-- `src/Kit/KitManager.php`
-- `src/Kit/KitManifest.php`
-- `src/Manifest.php`
-- `src/ManifestParser.php`
-- `src/Module.php`
-- `src/ModuleManager.php`
-- `src/ModuleRegistry.php`
-- `src/ModuleRunner.php`
-- `src/ModuleServiceProvider.php`
-- `src/TopologicalSorter.php`
+    public function boot(): void
+    {
+        parent::boot();
+    }
+}
+```
+
+**فایل:** `src/ModuleEngine.php`
+
+## وابستگی‌ها
+
+**موتورهای مورد‌نیاز:** `container`, `config`
 
 ## Service Providerها
 
 - `Tavaan\Engine\Module\ModuleServiceProvider`
 
-## وابستگی‌ها
+## سه درگاه ارتباط با سایر موتورها
 
-**موتورهای مورد‌نیاز:**
-
-- `container`
-- `config`
-
-## پیکربندی
-
-- فایل پیکربندی: `config/module.php`
-- کلید: `module`
+| درگاه | الگو | متدهای convenience |
+|---|---|---|
+| Container | pull-based DI | `make()`, `bound()` |
+| Events | pub/sub | `dispatch()`, `listen()` |
+| EngineBus | point-to-point RPC | `call()`, `offer()` |
 
 ## نصب
 
 ```bash
 git clone https://github.com/andrbi106/Tavaan-Engine-Module.git
 ```
-
-این موتور بخشی از فریمورک تَوان است و معمولاً به‌صورت مستقیم نصب نمی‌شود،
-بلکه توسط [Tavaan-Core](https://github.com/andrbi106/Tavaan-Core) مدیریت می‌شود.
-
-## روابط با سایر مخازن
-
-| مخزن | نقش |
-|---|---|
-| **`andrbi106/Tavaan-Engine-Module`** (این مخزن) | موتور Module |
-| `andrbi106/Tavaan-Engine-Core` | ساختار پایه + درگاه ارتباط موتورها |
-| `andrbi106/Tavaan-Core` | اسکلت اپلیکیشن + همهٔ موتورها |
-| `Derogaramin/Tavaan-Framework` | فریمورک مادر (monorepo) |
 
 ## مجوز
 
